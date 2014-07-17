@@ -36,8 +36,8 @@ huffmanTable Nothing = Map.empty
 huffmanTable (Just (Leaf {symbol = s})) = Map.singleton s []
 huffmanTable (Just (Branch {left = l, right = r}))
   = Map.union leftMap rightMap
-    where leftMap  = Map.map (0:) (huffmanTable (Just l))
-          rightMap = Map.map (1:) (huffmanTable (Just r))
+    where leftMap  = fmap (0:) (huffmanTable (Just l))
+          rightMap = fmap (1:) (huffmanTable (Just r))
 
 text :: String
 text = "The technique works by creating a binary tree of nodes. These can be stored in a regular array, the size of which depends on the number of symbols, n."
