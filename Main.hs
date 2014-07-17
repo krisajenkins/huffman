@@ -6,42 +6,40 @@ import           Data.Map (Map)
 import qualified Data.Map as Map
 import           Data.Ord
 
-data Node = Leaf { symbol :: Char, frequency :: Integer }
-          | Branch { left :: Node, right :: Node }
+data Node a = Leaf a Int
+          | Branch (Node a) (Node a)
   deriving (Show,Read,Eq)
 
-weight :: Node -> Integer
-weight (Leaf {frequency = f}) = f
-weight (Branch {left = l, right = r}) = weight l + weight r
+weight :: Node a -> Int
+weight (Leaf _ i) = i
+weight (Branch left right) = weight left + weight right
 
-charCount :: String -> Map Char Integer
-charCount = foldr f Map.empty
-  where f c = Map.insertWith (+) c 1
+aCount :: Ord a => [a] -> Map a Int
+aCount = foldl f Map.empty
+  where f m c = Map.insertWith (+) c 1 m
 
-freqToLeaves :: Map Char Integer -> [Node]
+freqToLeaves :: Ord a => Map a Int -> [Node a]
 freqToLeaves m = fmap f (Map.toList m)
-                   where f (k,v) = Leaf { symbol = k, frequency = v}
+                   where f (k,v) = Leaf k v
 
-firstPass :: String -> [Node]
-firstPass = freqToLeaves . charCount
+firstPass :: Ord a => [a] -> [Node a]
+firstPass = freqToLeaves . aCount
 
-huffmanEncode :: [Node] -> Maybe Node
+huffmanEncode :: [Node a] -> Maybe (Node a)
 huffmanEncode [] = Nothing
 huffmanEncode [n] = Just n
-huffmanEncode (n:m:ns) = huffmanEncode (sortBy (comparing weight) (x:ns))
-  where x = Branch {left = n, right = m}
+huffmanEncode (n:m:ns) = huffmanEncode (sortBy (comparing weight) ((Branch n m):ns))
 
-huffmanTable :: Maybe Node -> Map Char [Integer]
-huffmanTable Nothing = Map.empty
-huffmanTable (Just (Leaf {symbol = s})) = Map.singleton s []
-huffmanTable (Just (Branch {left = l, right = r}))
+huffmanTable :: Ord a => Node a -> Map a [Int]
+huffmanTable (Leaf c _) = Map.singleton c []
+huffmanTable (Branch left right)
   = Map.union leftMap rightMap
-    where leftMap  = fmap (0:) (huffmanTable (Just l))
-          rightMap = fmap (1:) (huffmanTable (Just r))
+    where leftMap  = fmap (0:) (huffmanTable left)
+          rightMap = fmap (1:) (huffmanTable right)
 
 text :: String
 text = "The technique works by creating a binary tree of nodes. These can be stored in a regular array, the size of which depends on the number of symbols, n."
 
 main :: IO ()
 main = mapM_ print (Map.toList solution)
- where solution = (huffmanTable . huffmanEncode . firstPass) text
+ where solution = (maybe Map.empty huffmanTable . huffmanEncode . firstPass) text
