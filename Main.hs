@@ -16,8 +16,7 @@ weight (Branch {left = l, right = r}) = weight l + weight r
 
 charCount :: String -> Map Char Integer
 charCount = foldr f Map.empty
-  where f :: Char -> Map Char Integer -> Map Char Integer
-        f c = Map.insertWith (+) c 1
+  where f c = Map.insertWith (+) c 1
 
 freqToLeaves :: Map Char Integer -> [Node]
 freqToLeaves m = fmap f (Map.toList m)
@@ -29,7 +28,7 @@ firstPass = freqToLeaves . charCount
 huffmanEncode :: [Node] -> Maybe Node
 huffmanEncode [] = Nothing
 huffmanEncode [n] = Just n
-huffmanEncode (n:m:ns) = huffmanEncode $ sortBy (comparing weight) (x:ns)
+huffmanEncode (n:m:ns) = huffmanEncode (sortBy (comparing weight) (x:ns))
   where x = Branch {left = n, right = m}
 
 huffmanTable :: Maybe Node -> Map Char [Integer]
