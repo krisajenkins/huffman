@@ -1,0 +1,9 @@
+* Huffman Encoding in Haskell
+
+Put together for the [[http://www.meetup.com/West-London-Hack-Night/events/192445532/][July 2014]] episode of [[http://www.meetup.com/West-London-Hack-Night/][West London Hack Night]].
+
+** Running
+
+#+BEGIN_SRC sh
+cabal run
+#+END_SRC
