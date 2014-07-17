@@ -44,4 +44,4 @@ text = "The technique works by creating a binary tree of nodes. These can be sto
 
 main :: IO ()
 main = mapM_ print (Map.toList solution)
- where solution = huffmanTable $ huffmanEncode $ firstPass text
+ where solution = (huffmanTable . huffmanEncode . firstPass) text
